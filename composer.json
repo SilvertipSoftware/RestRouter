@@ -13,12 +13,12 @@
     "keywords": ["Laravel", "RestRouter"],
     "autoload": {
         "psr-4": {
-            "Silvertip\\RestRouter\\": "src/"
+            "SilvertipSoftware\\RestRouter\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Silvertip\\RestRouter\\Tests\\": "tests"
+            "SilvertipSoftware\\RestRouter\\Tests\\": "tests"
         }
     }
 }

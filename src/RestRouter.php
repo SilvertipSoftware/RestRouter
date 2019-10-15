@@ -62,7 +62,7 @@ class RestRouter
         return $url;
     }
 
-    private static function processArgs(...$models)
+    protected static function processArgs(...$models)
     {
         $options = [];
         $last_arg = end($models);
@@ -79,15 +79,15 @@ class RestRouter
         return [$models, $options];
     }
 
-    private static function processLastFragment($model, &$prefixes, &$params, &$isCollection, $options)
+    protected static function processLastFragment($model, &$prefixes, &$params, &$isCollection, $options)
     {
         if ($model instanceof Model) {
             $class = get_class($model);
             $isCollection = !$model->exists;
             if (!$isCollection) {
-                if ($shallow = $options['shallow'] && count($params) > 0) {
-                    // remove the last prefix and param, so eg. users.emails becomes just emails
-                    // but only if we've gotten a model above us
+                if ($options['shallow'] && count($params) > 0) {
+                    // Remove the last prefix and param. `users.emails` becomes
+                    // just `emails`, but only if we've gotten a model above us.
                     array_pop($prefixes);
                     array_pop($params);
                 }
@@ -100,7 +100,7 @@ class RestRouter
         }
     }
 
-    private static function processIntermediateFragment($model, &$prefixes, &$params, $options)
+    protected static function processIntermediateFragment($model, &$prefixes, &$params, $options)
     {
         if ($model instanceof Model) {
             $class = get_class($model);
@@ -111,7 +111,7 @@ class RestRouter
         }
     }
 
-    private static function findRoute($prefix, $isCollection, $options)
+    protected static function findRoute($prefix, $isCollection, $options)
     {
         $actions = $options['action'] ?? ($isCollection ? [null, 'index', 'store'] : ['show', 'update', 'destroy']);
 
@@ -127,12 +127,12 @@ class RestRouter
         return null;
     }
 
-    private static function prefixFromClass($class)
+    protected static function prefixFromClass($class)
     {
         return Str::plural(Str::snake(class_basename($class)));
     }
 
-    private static function parameterNameFromClass($class)
+    protected static function parameterNameFromClass($class)
     {
         //TODO: use mappings defined in Route
         return Str::snake(class_basename($class)) . '_id';
