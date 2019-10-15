@@ -1,0 +1,140 @@
+<?php
+
+namespace SilvertipSoftware\RestRouter;
+
+use \Exception;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+
+class RestRouter
+{
+
+    public static $shallowResources = true;
+
+    public static function url(...$models)
+    {
+        list($models, $options) = static::processArgs(...$models);
+        return static::polymorphicRoute($models, $options);
+    }
+
+    public static function path(...$models)
+    {
+        list($models, $options) = static::processArgs(...$models);
+        return static::polymorphicRoute($models, $options, false);
+    }
+
+    public static function polymorphicRoute($models, $options = [], $absolute = true)
+    {
+        $models = Arr::flatten([$models]);
+
+        $routePrefixes = [];
+        $routeParams = [];
+        $isCollection = false;
+        $options['shallow'] = $options['shallow'] ?? static::$shallowResources;
+
+        foreach ($models as $index => $model) {
+            if ($index == count($models) - 1) {
+                static::processLastFragment($model, $routePrefixes, $routeParams, $isCollection, $options);
+            } else {
+                static::processIntermediateFragment($model, $routePrefixes, $routeParams, $options);
+            }
+        }
+
+        $routePrefix = implode('.', $routePrefixes);
+        $routeName = static::findRoute($routePrefix, $isCollection, $options);
+
+        if (!$routeName) {
+            throw new Exception(
+                'Cannot find route for models. Trying the '
+                    . ($isCollection ? 'collection' : 'single')
+                    . ' variants of ' . $routePrefix
+            );
+        }
+
+        $format = Arr::pull($options, 'format');
+        $options = Arr::except($options, ['action', 'shallow']);
+        $url = route($routeName, array_merge($routeParams, $options), $absolute);
+        if ($format) {
+            $url .= '.' . $format;
+        }
+
+        return $url;
+    }
+
+    private static function processArgs(...$models)
+    {
+        $options = [];
+        $last_arg = end($models);
+        if (count($models) <= 1) {
+            return [$models, $options];
+        }
+        if (is_array($last_arg)) {
+            $options = array_pop($models);
+        }
+        if (is_string($last_arg) && in_array($last_arg, ['edit', 'create', 'destroy'])) {
+            $options = ['action' => array_pop($models)];
+        }
+        $models = Arr::flatten([$models]);
+        return [$models, $options];
+    }
+
+    private static function processLastFragment($model, &$prefixes, &$params, &$isCollection, $options)
+    {
+        if ($model instanceof Model) {
+            $class = get_class($model);
+            $isCollection = !$model->exists;
+            if (!$isCollection) {
+                if ($shallow = $options['shallow'] && count($params) > 0) {
+                    // remove the last prefix and param, so eg. users.emails becomes just emails
+                    // but only if we've gotten a model above us
+                    array_pop($prefixes);
+                    array_pop($params);
+                }
+                $params[static::parameterNameFromClass($class)] = $model->getKey();
+            }
+            $prefixes[] = static::prefixFromClass($class);
+        } elseif (is_string($model)) {
+            $prefixes[] = static::prefixFromClass($model);
+            $isCollection = true;
+        }
+    }
+
+    private static function processIntermediateFragment($model, &$prefixes, &$params, $options)
+    {
+        if ($model instanceof Model) {
+            $class = get_class($model);
+            $prefixes[] = static::prefixFromClass($class);
+            $params[static::parameterNameFromClass($class)] = $model->getKey();
+        } elseif (is_string($model)) {
+            $prefixes[] = $model;
+        }
+    }
+
+    private static function findRoute($prefix, $isCollection, $options)
+    {
+        $actions = $options['action'] ?? ($isCollection ? [null, 'index', 'store'] : ['show', 'update', 'destroy']);
+
+        $actions = (array) $actions;
+
+        foreach ($actions as $action) {
+            $route = $prefix . ($action ? '.' . $action : '');
+            if (\Route::has($route)) {
+                return $route;
+            }
+        }
+
+        return null;
+    }
+
+    private static function prefixFromClass($class)
+    {
+        return Str::plural(Str::snake(class_basename($class)));
+    }
+
+    private static function parameterNameFromClass($class)
+    {
+        //TODO: use mappings defined in Route
+        return Str::snake(class_basename($class)) . '_id';
+    }
+}
