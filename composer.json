@@ -1,0 +1,24 @@
+{
+    "name": "silvertipsoftware/rest-router",
+    "description": "Construct conventional urls by passing in model(s).",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Andre Sonnichsen",
+            "email": "andre@silvertipsoftware.com",
+            "homepage": "http://silvertipsoftware.com/"
+        }
+    ],
+    "homepage": "https://github.com/SilvertipSoftware/RestRouter",
+    "keywords": ["Laravel", "RestRouter"],
+    "autoload": {
+        "psr-4": {
+            "Silvertip\\RestRouter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Silvertip\\RestRouter\\Tests\\": "tests"
+        }
+    }
+}
