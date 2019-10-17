@@ -3,9 +3,10 @@
 namespace SilvertipSoftware\RestRouter;
 
 use \Exception;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
+use App\Routing\VPLiteResourceRegistrar;
 
 class RestRouter
 {
@@ -134,7 +135,8 @@ class RestRouter
 
     protected static function parameterNameFromClass($class)
     {
-        //TODO: use mappings defined in Route
-        return Str::snake(class_basename($class)) . '_id';
+        $value = Str::snake(class_basename($class));
+        $resource_registrar = app('Illuminate\Routing\ResourceRegistrar');
+        return $resource_registrar->getResourceWildcard($value);
     }
 }

@@ -1,6 +1,6 @@
 {
     "name": "silvertipsoftware/rest-router",
-    "description": "Construct conventional urls by passing in model(s).",
+    "description": "Smart url construction using classes and models",
     "license": "MIT",
     "authors": [
         {

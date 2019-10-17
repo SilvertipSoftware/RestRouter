@@ -3,7 +3,7 @@
 namespace SilvertipSoftware\RestRouter;
 
 /**
- * Smart url construction using routes and models.
+ * Smart url construction using classes and models.
  */
 class UrlMixins
 {
