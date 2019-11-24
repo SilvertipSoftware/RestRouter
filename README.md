@@ -30,7 +30,7 @@ The `url()` and `path()` methods will now be available on `URL`.
 
 `RestRouter` is built primarily to work on routes defined with the `Route::resource()` method of 
 Laravel's router, although hand-rolled routes can also be used. Behind the scenes, `RestRouter` 
-uses the route names to create urls; the actual textof the url is irrelevant. 
+uses the route names to create urls; the actual text of the url is irrelevant.
 
 ### Simple Resource Routes
 
