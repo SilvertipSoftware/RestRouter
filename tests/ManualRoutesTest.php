@@ -30,7 +30,15 @@ class ManualRoutesTest extends TestCase
         );
     }
 
+    public function testTakesRouteParameter() {
+        $this->router->get('/{account_id}/posts/{post}', $this->action)->name('posts.show');
+        $this->router->getRoutes()->refreshNameLookups();
 
+        $this->assertEquals(
+            '/111/posts/' . $this->savedPost->id,
+            RestRouter::path($this->savedPost, ['account_id' => 111])
+        );
+    }
     public function testFallsBackToStoreActionForClass()
     {
         $this->router->post('/posts', $this->action)->name('posts.store');
