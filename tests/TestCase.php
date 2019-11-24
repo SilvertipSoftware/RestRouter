@@ -8,13 +8,12 @@ use SilvertipSoftware\RestRouter\RestRouter;
 class TestCase extends OrchestraTestCase
 {
 
-    $this->action = function () {
-    };
-
     public function setUp(): void
     {
         parent::setUp();
         $this->router = app('router');
+        $this->action = function () {
+        };
 
         // reset to default/known
         RestRouter::$shallowResources = true;
