@@ -11,6 +11,9 @@
     ],
     "homepage": "https://github.com/SilvertipSoftware/RestRouter",
     "keywords": ["Laravel", "RestRouter"],
+    "require-dev": {
+        "orchestra/testbench": "^4.0"
+    },
     "autoload": {
         "psr-4": {
             "SilvertipSoftware\\RestRouter\\": "src/"

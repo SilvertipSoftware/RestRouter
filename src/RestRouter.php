@@ -6,7 +6,6 @@ use \Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
-use App\Routing\VPLiteResourceRegistrar;
 
 class RestRouter
 {
@@ -47,9 +46,9 @@ class RestRouter
 
         if (!$routeName) {
             throw new Exception(
-                'Cannot find route for models. Trying the '
+                'Cannot find route with prefix "'. $routePrefix .'." using the '
                     . ($isCollection ? 'collection' : 'single')
-                    . ' variants of ' . $routePrefix
+                    . ' action variants.'
             );
         }
 
@@ -73,7 +72,7 @@ class RestRouter
         if (is_array($last_arg)) {
             $options = array_pop($models);
         }
-        if (is_string($last_arg) && in_array($last_arg, ['edit', 'create', 'destroy'])) {
+        if (is_string($last_arg) && in_array($last_arg, ['edit', 'create'])) {
             $options = ['action' => array_pop($models)];
         }
         $models = Arr::flatten([$models]);
@@ -135,7 +134,7 @@ class RestRouter
 
     protected static function parameterNameFromClass($class)
     {
-        $value = Str::snake(class_basename($class));
+        $value = Str::snake(Str::plural(class_basename($class)));
         $resource_registrar = app('Illuminate\Routing\ResourceRegistrar');
         return $resource_registrar->getResourceWildcard($value);
     }
