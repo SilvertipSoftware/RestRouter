@@ -2,10 +2,11 @@
 
 namespace SilvertipSoftware\RestRouter;
 
-use \Exception;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class RestRouter
 {
@@ -119,7 +120,7 @@ class RestRouter
 
         foreach ($actions as $action) {
             $route = $prefix . ($action ? '.' . $action : '');
-            if (\Route::has($route)) {
+            if (Route::has($route)) {
                 return $route;
             }
         }
